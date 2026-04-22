@@ -124,7 +124,7 @@ async function writeDebugArtifacts({
  */
 export function createPrivateCodexProvider(config) {
   return {
-    async generateImage({ prompt, model, outputPath, dryRun = false, debug = false, debugDir, fetchImpl = globalThis.fetch }) {
+    async generateImage({ prompt, model, outputPath, dryRun = false, debug = false, debugDir, fetchImpl = globalThis.fetch, image }) {
       const session = await loadCodexSession(config);
       const validation = validateCodexSession(session);
       const request = buildResponsesRequest({
@@ -132,7 +132,8 @@ export function createPrivateCodexProvider(config) {
         session,
         prompt,
         model,
-        originator: config.defaultOriginator
+        originator: config.defaultOriginator,
+        image
       });
 
       if (dryRun) {
@@ -219,8 +220,8 @@ export function createPrivateCodexProvider(config) {
         });
       }
 
-      const image = extractImageGeneration(parsed);
-      const savedPath = await saveImage({ resultBase64: image.resultBase64, outputPath });
+      const generation = extractImageGeneration(parsed);
+      const savedPath = await saveImage({ resultBase64: generation.resultBase64, outputPath });
 
       return {
         mode: 'live',
@@ -228,7 +229,7 @@ export function createPrivateCodexProvider(config) {
         responseId: parsed.responseId,
         sessionId: request.sessionId,
         savedPath,
-        revisedPrompt: image.revisedPrompt,
+        revisedPrompt: generation.revisedPrompt,
         request: request.sanitized,
         response: {
           status: response.status,

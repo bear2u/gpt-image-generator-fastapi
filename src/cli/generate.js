@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 // @ts-nocheck
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { resolveConfig, UNSUPPORTED_WARNING } from '../config.js';
 import { createProvider } from '../providers/createProvider.js';
 import { SUPPORTED_PROVIDERS } from '../providers/providerTypes.js';
+
+const EXT_TO_MIME = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp'
+};
 
 function parseArgs(argv) {
   const parsed = {
@@ -19,6 +28,7 @@ function parseArgs(argv) {
     installationIdFile: null,
     debugDir: null,
     provider: null,
+    image: null,
     help: false
   };
 
@@ -63,6 +73,10 @@ function parseArgs(argv) {
         parsed.provider = next;
         index += 1;
         break;
+      case '--image':
+        parsed.image = next;
+        index += 1;
+        break;
       case '--dry-run':
         parsed.dryRun = true;
         break;
@@ -87,6 +101,28 @@ function parseArgs(argv) {
   return parsed;
 }
 
+async function readImageAsDataUrl(imagePath) {
+  const resolved = path.resolve(imagePath);
+  let stats;
+  try {
+    stats = await fs.stat(resolved);
+  } catch {
+    throw new Error(`Image file not found: ${imagePath}`);
+  }
+  if (!stats.isFile()) {
+    throw new Error(`Image path is not a file: ${imagePath}`);
+  }
+
+  const ext = path.extname(resolved).toLowerCase().replace(/^\./, '');
+  const mime = EXT_TO_MIME[ext];
+  if (!mime) {
+    throw new Error(`Unsupported image extension "${ext}". Supported: png, jpg, jpeg, gif, webp.`);
+  }
+
+  const buffer = await fs.readFile(resolved);
+  return `data:${mime};base64,${buffer.toString('base64')}`;
+}
+
 function printHelp() {
   console.log(`
 ${UNSUPPORTED_WARNING}
@@ -99,6 +135,7 @@ Options:
   --output <path>               Output PNG path
   --model <name>                Model name (default: CODEX_IMAGEGEN_MODEL or gpt-5.4)
   --provider <name>             Provider: private-codex | codex-cli | auto
+  --image <path>                Input image path (png, jpg, jpeg, gif, webp)
   --dry-run                     Print the request shape without calling the backend
   --debug                       Write sanitized request/response dumps
   --debug-dir <path>            Directory for sanitized debug artifacts
@@ -127,6 +164,8 @@ async function main() {
   const provider = createProvider(config);
   const outputPath = path.resolve(args.output || config.defaultOutputPath);
 
+  const image = args.image ? await readImageAsDataUrl(args.image) : undefined;
+
   console.warn(UNSUPPORTED_WARNING);
   const result = await provider.generateImage({
     prompt: args.prompt,
@@ -134,7 +173,8 @@ async function main() {
     outputPath,
     dryRun: args.dryRun,
     debug: args.debug,
-    debugDir: args.debugDir ? path.resolve(args.debugDir) : args.debug ? path.resolve('.debug-codex-imagegen') : null
+    debugDir: args.debugDir ? path.resolve(args.debugDir) : args.debug ? path.resolve('.debug-codex-imagegen') : null,
+    image
   });
 
   if (result.mode === 'dry-run') {

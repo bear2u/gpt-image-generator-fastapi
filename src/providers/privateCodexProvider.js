@@ -147,11 +147,17 @@ export function createPrivateCodexProvider(config) {
         throw new Error('No fetch implementation is available in this Node runtime.');
       }
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300_000);
+
       const response = await fetchImpl(request.url, {
         method: 'POST',
         headers: request.headers,
-        body: JSON.stringify(request.body)
+        body: JSON.stringify(request.body),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       const responseHeaders = Object.fromEntries(response.headers.entries());
       const contentType = response.headers.get('content-type') || '';

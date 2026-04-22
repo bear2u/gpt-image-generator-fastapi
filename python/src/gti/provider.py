@@ -151,7 +151,7 @@ class PrivateCodexProvider:
             return {"mode": "dry-run", "warnings": validation["warnings"], "request": request["sanitized"]}
 
         owns_client = client is None
-        client = client or httpx.Client()
+        client = client or httpx.Client(timeout=300.0)
         try:
             response = client.post(request["url"], headers=request["headers"], json=request["body"])
         finally:

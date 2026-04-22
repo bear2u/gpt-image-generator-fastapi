@@ -1,0 +1,163 @@
+#!/usr/bin/env node
+// @ts-nocheck
+import path from 'node:path';
+
+import { resolveConfig, UNSUPPORTED_WARNING } from '../config.js';
+import { createProvider } from '../providers/createProvider.js';
+import { SUPPORTED_PROVIDERS } from '../providers/providerTypes.js';
+
+function parseArgs(argv) {
+  const parsed = {
+    dryRun: false,
+    debug: false,
+    output: null,
+    prompt: null,
+    model: null,
+    codexHome: null,
+    baseUrl: null,
+    authFile: null,
+    installationIdFile: null,
+    debugDir: null,
+    provider: null,
+    help: false
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    const next = argv[index + 1];
+
+    switch (token) {
+      case '--prompt':
+        parsed.prompt = next;
+        index += 1;
+        break;
+      case '--output':
+        parsed.output = next;
+        index += 1;
+        break;
+      case '--model':
+        parsed.model = next;
+        index += 1;
+        break;
+      case '--codex-home':
+        parsed.codexHome = next;
+        index += 1;
+        break;
+      case '--base-url':
+        parsed.baseUrl = next;
+        index += 1;
+        break;
+      case '--auth-file':
+        parsed.authFile = next;
+        index += 1;
+        break;
+      case '--installation-id-file':
+        parsed.installationIdFile = next;
+        index += 1;
+        break;
+      case '--debug-dir':
+        parsed.debugDir = next;
+        index += 1;
+        break;
+      case '--provider':
+        parsed.provider = next;
+        index += 1;
+        break;
+      case '--dry-run':
+        parsed.dryRun = true;
+        break;
+      case '--debug':
+        parsed.debug = true;
+        break;
+      case '--help':
+      case '-h':
+        parsed.help = true;
+        break;
+      default:
+        if (!token.startsWith('-') && !parsed.prompt) {
+          parsed.prompt = token;
+        } else if (!token.startsWith('-') && !parsed.output) {
+          parsed.output = token;
+        } else {
+          throw new Error(`Unknown argument: ${token}`);
+        }
+    }
+  }
+
+  return parsed;
+}
+
+function printHelp() {
+  console.log(`
+${UNSUPPORTED_WARNING}
+
+Usage:
+  node src/cli/generate.js --prompt "flat blue square icon" --output ./out/image.png
+
+Options:
+  --prompt <text>               Required prompt text
+  --output <path>               Output PNG path
+  --model <name>                Model name (default: CODEX_IMAGEGEN_MODEL or gpt-5.4)
+  --provider <name>             Provider: private-codex | codex-cli | auto
+  --dry-run                     Print the request shape without calling the backend
+  --debug                       Write sanitized request/response dumps
+  --debug-dir <path>            Directory for sanitized debug artifacts
+  --codex-home <path>           Override CODEX_HOME
+  --auth-file <path>            Override auth.json path
+  --installation-id-file <path> Override installation_id path
+  --base-url <url>              Override private Codex base URL
+  -h, --help                    Show help
+`);
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.help || !args.prompt) {
+    printHelp();
+    if (!args.prompt && !args.help) {
+      process.exitCode = 1;
+    }
+    return;
+  }
+
+  const config = resolveConfig(args);
+  if (!SUPPORTED_PROVIDERS.includes(config.provider)) {
+    throw new Error(`Unsupported provider: ${config.provider}`);
+  }
+  const provider = createProvider(config);
+  const outputPath = path.resolve(args.output || config.defaultOutputPath);
+
+  console.warn(UNSUPPORTED_WARNING);
+  const result = await provider.generateImage({
+    prompt: args.prompt,
+    model: args.model || config.defaultModel,
+    outputPath,
+    dryRun: args.dryRun,
+    debug: args.debug,
+    debugDir: args.debugDir ? path.resolve(args.debugDir) : args.debug ? path.resolve('.debug-codex-imagegen') : null
+  });
+
+  if (result.mode === 'dry-run') {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  for (const warning of result.warnings) {
+    console.warn(`warning: ${warning}`);
+  }
+
+  console.log(JSON.stringify({
+    provider: result.provider || config.provider,
+    savedPath: result.savedPath,
+    responseId: result.responseId,
+    sessionId: result.sessionId,
+    revisedPrompt: result.revisedPrompt,
+    httpStatus: result.response.status
+  }, null, 2));
+}
+
+main().catch((error) => {
+  console.error(UNSUPPORTED_WARNING);
+  console.error(error?.stack || error?.message || String(error));
+  process.exitCode = 1;
+});

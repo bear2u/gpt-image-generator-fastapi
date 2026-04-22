@@ -5,8 +5,8 @@ import json
 import httpx
 import pytest
 
-from src.god_tibo_imagen.errors import CodexError
-from src.god_tibo_imagen.provider import create_private_codex_provider
+from src.gti.errors import CodexError
+from src.gti.provider import create_private_codex_provider
 from .conftest import fixture_text, make_jwt
 from typing import cast
 

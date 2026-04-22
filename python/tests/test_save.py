@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from src.god_tibo_imagen.errors import CodexError
-from src.god_tibo_imagen.save import save_image
+from src.gti.errors import CodexError
+from src.gti.save import save_image
 from typing import cast
 
 

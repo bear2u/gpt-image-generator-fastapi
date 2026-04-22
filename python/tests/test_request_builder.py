@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.god_tibo_imagen.request_builder import (
+from src.gti.request_builder import (
     REDACTED_ACCOUNT_ID,
     REDACTED_INSTALLATION_ID,
     REDACTED_SESSION_ID,

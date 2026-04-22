@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.god_tibo_imagen.config import PRIVATE_CODEX_PROVIDER, resolve_config
+from src.gti.config import PRIVATE_CODEX_PROVIDER, resolve_config
 
 
 def test_resolve_config_uses_env_defaults(monkeypatch, tmp_path):

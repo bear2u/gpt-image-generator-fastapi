@@ -31,26 +31,26 @@ npm install -g god-tibo-imagen
 ```bash
 npm test
 npm run check
-god-tibo-imagen --prompt "flat blue square icon" --output ./out/blue-square.png
+gti --prompt "flat blue square icon" --output ./out/blue-square.png
 ```
 
 ### Provider modes
 
 ```bash
 # direct private HTTP path
-god-tibo-imagen --provider private-codex --prompt "flat blue square icon" --output ./out.png
+gti --provider private-codex --prompt "flat blue square icon" --output ./out.png
 
 # borrow the Hermes-style codex exec workaround
-god-tibo-imagen --provider codex-cli --prompt "flat blue square icon" --output ./out.png
+gti --provider codex-cli --prompt "flat blue square icon" --output ./out.png
 
 # try private HTTP first, then fall back to codex-cli
-god-tibo-imagen --provider auto --prompt "flat blue square icon" --output ./out.png
+gti --provider auto --prompt "flat blue square icon" --output ./out.png
 ```
 
 ### Dry run
 
 ```bash
-god-tibo-imagen --prompt "flat blue square icon" --dry-run
+gti --prompt "flat blue square icon" --dry-run
 ```
 
 ### Live smoke test
@@ -81,7 +81,7 @@ console.log(result.savedPath);
 ## Python SDK
 
 ```python
-from god_tibo_imagen import Client
+from gti import Client
 
 client = Client(provider="private-codex")
 result = client.generate_image(
@@ -95,7 +95,7 @@ print(result.saved_path)
 Install the Python SDK with:
 
 ```bash
-pip install god-tibo-imagen
+pip install gti
 ```
 
 ## Key files

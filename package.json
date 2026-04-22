@@ -1,6 +1,6 @@
 {
   "name": "god-tibo-imagen",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Node.js library and CLI for Codex private ChatGPT-authenticated image generation",
@@ -15,7 +15,7 @@
   },
   "types": "./types/index.d.ts",
   "bin": {
-    "god-tibo-imagen": "./src/cli/generate.js"
+    "gti": "./src/cli/generate.js"
   },
   "files": [
     "src/",

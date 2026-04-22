@@ -4,7 +4,7 @@ import json
 
 import httpx
 
-from src.god_tibo_imagen.client import Client
+from src.gti.client import Client
 from .conftest import fixture_text, make_jwt
 
 

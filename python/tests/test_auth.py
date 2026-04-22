@@ -6,8 +6,8 @@ from typing import cast
 
 import pytest
 
-from src.god_tibo_imagen.auth import load_codex_session, validate_codex_session
-from src.god_tibo_imagen.errors import CodexError
+from src.gti.auth import load_codex_session, validate_codex_session
+from src.gti.errors import CodexError
 from .conftest import make_jwt
 
 

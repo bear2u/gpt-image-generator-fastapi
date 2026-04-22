@@ -3,9 +3,9 @@ from __future__ import annotations
 import pytest
 from typing import cast
 
-from src.god_tibo_imagen.errors import CodexError
-from src.god_tibo_imagen.extract import extract_image_generation
-from src.god_tibo_imagen.sse_parser import parse_sse_text
+from src.gti.errors import CodexError
+from src.gti.extract import extract_image_generation
+from src.gti.sse_parser import parse_sse_text
 from .conftest import fixture_text
 
 

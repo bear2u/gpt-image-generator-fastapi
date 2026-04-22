@@ -76,6 +76,16 @@ npm run check
 gti --prompt "flat blue square icon" --output ./out/blue-square.png
 ```
 
+### Image input
+
+You can provide an existing image as additional context alongside your text prompt. The image is embedded as a base64 data URL and sent with the request.
+
+```bash
+gti --prompt "Make this cat wear a hat" --image ./cat.png --output ./cat-hat.png
+```
+
+Supported formats: `png`, `jpg`/`jpeg`, `gif`, `webp`.
+
 ### Provider modes
 
 ```bash
@@ -120,6 +130,17 @@ const result = await provider.generateImage({
 console.log(result.savedPath);
 ```
 
+You can also pass an existing image as input:
+
+```javascript
+const result = await provider.generateImage({
+  prompt: 'Make this cat wear a hat',
+  model: 'gpt-5.4',
+  outputPath: './cat-hat.png',
+  image: 'data:image/png;base64,iVBORw0KGgo...'
+});
+```
+
 ## Python SDK
 
 ```python
@@ -132,6 +153,17 @@ result = client.generate_image(
     output_path="./out.png"
 )
 print(result.saved_path)
+```
+
+You can also pass an existing image as input:
+
+```python
+result = client.generate_image(
+    prompt="Make this cat wear a hat",
+    model="gpt-5.4",
+    output_path="./cat-hat.png",
+    image_path="./cat.png"
+)
 ```
 
 
@@ -171,6 +203,18 @@ result = client.generate_image(
     prompt="flat blue square icon",
     model="gpt-5.4",
     output_path="./out.png"
+)
+print(result.saved_path)
+```
+
+With an image input:
+
+```python
+result = client.generate_image(
+    prompt="Make this cat wear a hat",
+    model="gpt-5.4",
+    output_path="./cat-hat.png",
+    image_path="./cat.png"
 )
 print(result.saved_path)
 ```

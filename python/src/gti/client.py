@@ -75,18 +75,23 @@ class Client:
         prompt: str,
         model: str | None = None,
         output_path: str | None = None,
-        image_path: str | None = None,
+        image_paths: list[str] | str | None = None,
         dry_run: bool = False,
         debug: bool = False,
         debug_dir: str | None = None,
         client=None,
     ) -> GenerateImageResult:
-        image = _image_path_to_data_url(image_path) if image_path is not None else None
+        if image_paths is None:
+            images = None
+        elif isinstance(image_paths, str):
+            images = [_image_path_to_data_url(image_paths)]
+        else:
+            images = [_image_path_to_data_url(p) for p in image_paths]
         payload = self.provider.generate_image(
             prompt=prompt,
             model=model or self.config["defaultModel"],
             output_path=output_path or self.config["defaultOutputPath"],
-            image=image,
+            images=images,
             dry_run=dry_run,
             debug=debug,
             debug_dir=debug_dir,

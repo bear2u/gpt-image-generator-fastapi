@@ -28,7 +28,7 @@ function parseArgs(argv) {
     installationIdFile: null,
     debugDir: null,
     provider: null,
-    image: null,
+    images: [],
     help: false
   };
 
@@ -74,7 +74,7 @@ function parseArgs(argv) {
         index += 1;
         break;
       case '--image':
-        parsed.image = next;
+        parsed.images.push(next);
         index += 1;
         break;
       case '--dry-run':
@@ -135,7 +135,7 @@ Options:
   --output <path>               Output PNG path
   --model <name>                Model name (default: CODEX_IMAGEGEN_MODEL or gpt-5.4)
   --provider <name>             Provider: private-codex | codex-cli | auto
-  --image <path>                Input image path (png, jpg, jpeg, gif, webp)
+  --image <path>                Input image path (can be used multiple times)
   --dry-run                     Print the request shape without calling the backend
   --debug                       Write sanitized request/response dumps
   --debug-dir <path>            Directory for sanitized debug artifacts
@@ -164,7 +164,9 @@ async function main() {
   const provider = createProvider(config);
   const outputPath = path.resolve(args.output || config.defaultOutputPath);
 
-  const image = args.image ? await readImageAsDataUrl(args.image) : undefined;
+  const images = args.images.length > 0
+    ? await Promise.all(args.images.map((img) => readImageAsDataUrl(img)))
+    : undefined;
 
   console.warn(UNSUPPORTED_WARNING);
   const result = await provider.generateImage({
@@ -174,7 +176,7 @@ async function main() {
     dryRun: args.dryRun,
     debug: args.debug,
     debugDir: args.debugDir ? path.resolve(args.debugDir) : args.debug ? path.resolve('.debug-codex-imagegen') : null,
-    image
+    images
   });
 
   if (result.mode === 'dry-run') {

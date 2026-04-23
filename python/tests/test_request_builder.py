@@ -43,7 +43,7 @@ def test_build_responses_request_requires_prompt():
     assert str(exc_info.value) == "Prompt is required."
 
 
-def test_build_responses_request_includes_input_image_when_image_provided():
+def test_build_responses_request_includes_input_image_when_images_provided():
     session = {"accessToken": "token-1", "accountId": "acct-1"}
     result = build_responses_request(
         base_url="https://chatgpt.com/backend-api/codex",
@@ -51,16 +51,17 @@ def test_build_responses_request_includes_input_image_when_image_provided():
         prompt="make this blue",
         model="gpt-5.4",
         originator="codex_cli_rs",
-        image="data:image/png;base64,abc123",
+        images=["data:image/png;base64,abc123", "data:image/png;base64,def456"],
     )
 
     content = result["body"]["input"][0]["content"]
-    assert len(content) == 2
+    assert len(content) == 3
     assert content[0] == {"type": "input_text", "text": "make this blue"}
     assert content[1] == {"type": "input_image", "image_url": "data:image/png;base64,abc123"}
+    assert content[2] == {"type": "input_image", "image_url": "data:image/png;base64,def456"}
 
 
-def test_build_responses_request_omits_input_image_when_image_none():
+def test_build_responses_request_omits_input_image_when_images_none():
     session = {"accessToken": "token-1", "accountId": "acct-1"}
     result = build_responses_request(
         base_url="https://chatgpt.com/backend-api/codex",
@@ -83,7 +84,7 @@ def test_build_responses_request_sanitizes_input_image_url():
         prompt="make this blue",
         model="gpt-5.4",
         originator="codex_cli_rs",
-        image="data:image/png;base64,secret",
+        images=["data:image/png;base64,secret"],
     )
 
     sanitized_content = result["sanitized"]["body"]["input"][0]["content"]

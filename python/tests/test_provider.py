@@ -134,15 +134,17 @@ def test_provider_rethrows_malformed_sse(tmp_path):
     assert error.code == "MALFORMED_SSE_JSON"
 
 
-def test_provider_forwards_image_to_request_body(tmp_path):
+def test_provider_forwards_images_to_request_body(tmp_path):
     auth_file, installation_file = _write_auth_state(tmp_path)
 
     def handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content)
         content = body["input"][0]["content"]
-        assert len(content) == 2
+        assert len(content) == 3
         assert content[1]["type"] == "input_image"
         assert content[1]["image_url"] == "data:image/png;base64,abc123"
+        assert content[2]["type"] == "input_image"
+        assert content[2]["image_url"] == "data:image/png;base64,def456"
         return httpx.Response(
             200,
             headers={"content-type": "text/event-stream"},
@@ -162,7 +164,7 @@ def test_provider_forwards_image_to_request_body(tmp_path):
         prompt="blue square",
         model="gpt-5.4",
         output_path=str(tmp_path / "out.png"),
-        image="data:image/png;base64,abc123",
+        images=["data:image/png;base64,abc123", "data:image/png;base64,def456"],
         client=client,
     )
     assert result["mode"] == "live"

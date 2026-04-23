@@ -38,7 +38,7 @@ test('buildResponsesRequest emits expected private Codex request', () => {
   });
 });
 
-test('buildResponsesRequest appends input_image when image is provided', () => {
+test('buildResponsesRequest appends input_image when images are provided', () => {
   const request = buildResponsesRequest({
     baseUrl: 'https://chatgpt.com/backend-api/codex',
     session: {
@@ -49,15 +49,17 @@ test('buildResponsesRequest appends input_image when image is provided', () => {
     prompt: 'make a blue square',
     model: 'gpt-5.4',
     originator: 'codex_cli_rs',
-    image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlAbwAAAABJRU5ErkJggg=='
+    images: ['data:image/png;base64,abc', 'data:image/png;base64,def']
   });
 
   const content = request.body.input[0].content;
-  assert.equal(content.length, 2);
+  assert.equal(content.length, 3);
   assert.equal(content[0].type, 'input_text');
   assert.equal(content[0].text, 'make a blue square');
   assert.equal(content[1].type, 'input_image');
-  assert.equal(content[1].image_url, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlAbwAAAABJRU5ErkJggg==');
+  assert.equal(content[1].image_url, 'data:image/png;base64,abc');
+  assert.equal(content[2].type, 'input_image');
+  assert.equal(content[2].image_url, 'data:image/png;base64,def');
 });
 
 test('sanitizeRequestBody redacts input_image.image_url', () => {

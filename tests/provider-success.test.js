@@ -62,7 +62,7 @@ test('private provider forwards image data URL to request builder', async () => 
     prompt: 'make a blue square',
     model: 'gpt-5.4',
     outputPath,
-    image: imageDataUrl,
+    images: [imageDataUrl],
     fetchImpl: async (_url, options) => {
       const body = JSON.parse(options.body);
       assert.equal(body.input[0].content.length, 2);

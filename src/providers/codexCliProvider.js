@@ -155,9 +155,9 @@ export function createCodexCliProvider(config) {
       debug = false,
       debugDir,
       execImpl = runCommand,
-      image
+      images
     }) {
-      if (image) {
+      if (images && images.length > 0) {
         throw new Error('The codex-cli provider does not support image input.');
       }
 

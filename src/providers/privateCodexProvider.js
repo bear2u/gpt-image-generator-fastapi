@@ -124,7 +124,7 @@ async function writeDebugArtifacts({
  */
 export function createPrivateCodexProvider(config) {
   return {
-    async generateImage({ prompt, model, outputPath, dryRun = false, debug = false, debugDir, fetchImpl = globalThis.fetch, image }) {
+    async generateImage({ prompt, model, outputPath, dryRun = false, debug = false, debugDir, fetchImpl = globalThis.fetch, images }) {
       const session = await loadCodexSession(config);
       const validation = validateCodexSession(session);
       const request = buildResponsesRequest({
@@ -133,7 +133,7 @@ export function createPrivateCodexProvider(config) {
         prompt,
         model,
         originator: config.defaultOriginator,
-        image
+        images
       });
 
       if (dryRun) {

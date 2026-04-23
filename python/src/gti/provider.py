@@ -131,7 +131,7 @@ class PrivateCodexProvider:
         prompt: str,
         model: str,
         output_path: str,
-        image: str | None = None,
+        images: list[str] | None = None,
         dry_run: bool = False,
         debug: bool = False,
         debug_dir: str | Path | None = None,
@@ -147,7 +147,7 @@ class PrivateCodexProvider:
             prompt=prompt,
             model=model,
             originator=self.config["defaultOriginator"],
-            image=image,
+            images=images,
         )
 
         if dry_run:

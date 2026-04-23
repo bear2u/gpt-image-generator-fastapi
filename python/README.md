@@ -26,14 +26,23 @@ print(result.saved_path)
 
 ### Image input
 
-You can provide an existing image as additional context alongside your text prompt. The image is embedded as a base64 data URL and sent with the request.
+You can provide existing images as additional context alongside your text prompt. Images are embedded as base64 data URLs and sent with the request.
 
 ```python
+# single image
 result = client.generate_image(
     prompt="Make this cat wear a hat",
     model="gpt-5.4",
     output_path="./cat-hat.png",
-    image_path="./cat.png"
+    image_paths="./cat.png"
+)
+
+# multiple images
+result = client.generate_image(
+    prompt="Combine these two styles",
+    model="gpt-5.4",
+    output_path="./combined.png",
+    image_paths=["./style-a.png", "./style-b.png"]
 )
 ```
 

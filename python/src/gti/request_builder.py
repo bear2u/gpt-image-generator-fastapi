@@ -47,7 +47,7 @@ def build_responses_request(
     originator: str,
     include_reasoning: bool = True,
     session_id: str | None = None,
-    image: str | None = None,
+    images: list[str] | None = None,
 ) -> dict[str, Any]:
     if not prompt or not prompt.strip():
         raise make_error("Prompt is required.")
@@ -66,8 +66,9 @@ def build_responses_request(
     }
 
     content: list[dict[str, Any]] = [{"type": "input_text", "text": prompt}]
-    if image is not None:
-        content.append({"type": "input_image", "image_url": image})
+    if images is not None:
+        for image in images:
+            content.append({"type": "input_image", "image_url": image})
 
     body = {
         "model": model,

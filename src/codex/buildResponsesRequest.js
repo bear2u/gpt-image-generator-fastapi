@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 export const REDACTED_ACCOUNT_ID = '[REDACTED_ACCOUNT_ID]';
 export const REDACTED_SESSION_ID = '[REDACTED_SESSION_ID]';
 export const REDACTED_INSTALLATION_ID = '[REDACTED_INSTALLATION_ID]';
+export const REDACTED_IMAGE_DATA = '[REDACTED_IMAGE_DATA]';
 
 /**
  * Return a redacted copy of request headers for debug output.
@@ -28,27 +29,43 @@ export function sanitizeHeaders(headers) {
 /**
  * Return a redacted copy of the request body for debug output.
  *
- * @param {{ client_metadata?: Record<string, string> } & Record<string, unknown>} body - Original request body.
- * @returns {{ client_metadata?: Record<string, string> } & Record<string, unknown>} Redacted body.
+ * @param {{ client_metadata?: Record<string, string>, input?: Array<{ content?: Array<{ type?: string, image_url?: string }> }> } & Record<string, unknown>} body - Original request body.
+ * @returns {{ client_metadata?: Record<string, string>, input?: Array<{ content?: Array<{ type?: string, image_url?: string }> }> } & Record<string, unknown>} Redacted body.
  */
 export function sanitizeRequestBody(body) {
-  if (!body?.client_metadata) {
-    return body;
-  }
+  const clone = { ...body };
 
-  return {
-    ...body,
-    client_metadata: {
+  if (body?.client_metadata) {
+    clone.client_metadata = {
       ...body.client_metadata,
       'x-codex-installation-id': REDACTED_INSTALLATION_ID
-    }
-  };
+    };
+  }
+
+  if (Array.isArray(body?.input)) {
+    clone.input = body.input.map((item) => {
+      if (!Array.isArray(item?.content)) {
+        return item;
+      }
+      return {
+        ...item,
+        content: item.content.map((block) => {
+          if (block?.type === 'input_image' && block?.image_url) {
+            return { ...block, image_url: REDACTED_IMAGE_DATA };
+          }
+          return block;
+        })
+      };
+    });
+  }
+
+  return clone;
 }
 
 /**
  * Build the private Codex `/responses` request payload.
  *
- * @param {{ baseUrl: string, session: { accessToken: string, accountId: string, installationId?: string | null }, prompt: string, model: string, originator: string, includeReasoning?: boolean, sessionId?: string }} options - Request inputs.
+ * @param {{ baseUrl: string, session: { accessToken: string, accountId: string, installationId?: string | null }, prompt: string, model: string, originator: string, includeReasoning?: boolean, sessionId?: string, images?: string[] }} options - Request inputs.
  * @returns {{ url: string, sessionId: string, headers: Record<string, string>, body: Record<string, unknown>, sanitized: { url: string, headers: Record<string, string>, body: Record<string, unknown> } }} Request details and a redacted debug copy.
  */
 export function buildResponsesRequest({
@@ -58,7 +75,8 @@ export function buildResponsesRequest({
   model,
   originator,
   includeReasoning = true,
-  sessionId = crypto.randomUUID()
+  sessionId = crypto.randomUUID(),
+  images
 }) {
   if (!prompt || !prompt.trim()) {
     throw new Error('Prompt is required.');
@@ -74,6 +92,13 @@ export function buildResponsesRequest({
     session_id: sessionId
   };
 
+  const content = [{ type: 'input_text', text: prompt }];
+  if (images && images.length > 0) {
+    for (const image of images) {
+      content.push({ type: 'input_image', image_url: image });
+    }
+  }
+
   const body = {
     model,
     instructions: '',
@@ -81,7 +106,7 @@ export function buildResponsesRequest({
       {
         type: 'message',
         role: 'user',
-        content: [{ type: 'input_text', text: prompt }]
+        content
       }
     ],
     tools: [{ type: 'image_generation', output_format: 'png' }],

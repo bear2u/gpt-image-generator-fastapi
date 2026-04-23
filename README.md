@@ -76,6 +76,20 @@ npm run check
 gti --prompt "flat blue square icon" --output ./out/blue-square.png
 ```
 
+### Image input
+
+You can provide existing images as additional context alongside your text prompt. Images are embedded as base64 data URLs and sent with the request. Use `--image` multiple times for multiple images.
+
+```bash
+# single image
+gti --prompt "Make this cat wear a hat" --image ./cat.png --output ./cat-hat.png
+
+# multiple images
+gti --prompt "Combine these two styles" --image ./style-a.png --image ./style-b.png --output ./combined.png
+```
+
+Supported formats: `png`, `jpg`/`jpeg`, `gif`, `webp`.
+
 ### Provider modes
 
 ```bash
@@ -120,6 +134,29 @@ const result = await provider.generateImage({
 console.log(result.savedPath);
 ```
 
+You can also pass existing images as input:
+
+```javascript
+// single image
+const result = await provider.generateImage({
+  prompt: 'Make this cat wear a hat',
+  model: 'gpt-5.4',
+  outputPath: './cat-hat.png',
+  images: ['data:image/png;base64,iVBORw0KGgo...']
+});
+
+// multiple images
+const result = await provider.generateImage({
+  prompt: 'Combine these two styles',
+  model: 'gpt-5.4',
+  outputPath: './combined.png',
+  images: [
+    'data:image/png;base64,abc...',
+    'data:image/png;base64,def...'
+  ]
+});
+```
+
 ## Python SDK
 
 ```python
@@ -132,6 +169,26 @@ result = client.generate_image(
     output_path="./out.png"
 )
 print(result.saved_path)
+```
+
+You can also pass existing images as input:
+
+```python
+# single image
+result = client.generate_image(
+    prompt="Make this cat wear a hat",
+    model="gpt-5.4",
+    output_path="./cat-hat.png",
+    image_paths="./cat.png"
+)
+
+# multiple images
+result = client.generate_image(
+    prompt="Combine these two styles",
+    model="gpt-5.4",
+    output_path="./combined.png",
+    image_paths=["./style-a.png", "./style-b.png"]
+)
 ```
 
 
@@ -171,6 +228,18 @@ result = client.generate_image(
     prompt="flat blue square icon",
     model="gpt-5.4",
     output_path="./out.png"
+)
+print(result.saved_path)
+```
+
+With image inputs:
+
+```python
+result = client.generate_image(
+    prompt="Make this cat wear a hat",
+    model="gpt-5.4",
+    output_path="./cat-hat.png",
+    image_paths="./cat.png"
 )
 print(result.saved_path)
 ```

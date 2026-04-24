@@ -40,7 +40,7 @@ def test_index_renders(tmp_path):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "god-tibo-imagen" in response.text
+    assert "GPT2-imagen" in response.text
 
 
 def test_generate_dry_run(tmp_path):

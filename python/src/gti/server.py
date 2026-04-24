@@ -72,7 +72,7 @@ def create_app(
     client_factory: Callable[..., Client] = Client,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
 ) -> FastAPI:
-    app = FastAPI(title="GPT2-imagen server", version="0.2.0")
+    app = FastAPI(title="Gpt-imagen v2 server", version="0.2.0")
 
     @app.get("/", response_class=HTMLResponse)
     async def index() -> str:
@@ -143,7 +143,7 @@ INDEX_HTML = """
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GPT2-imagen</title>
+  <title>Gpt-imagen v2</title>
   <style>
     :root {
       color-scheme: light;
@@ -350,7 +350,7 @@ INDEX_HTML = """
   <main>
     <aside>
       <div class="brand">
-        <h1>GPT2-imagen</h1>
+        <h1>Gpt-imagen v2</h1>
         <div class="status" id="status">ready</div>
       </div>
 

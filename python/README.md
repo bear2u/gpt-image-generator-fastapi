@@ -60,6 +60,14 @@ print(result["mode"])  # "dry-run"
 
 ## FastAPI test server
 
+From the repository root, run:
+
+```bash
+./run.sh
+```
+
+This creates `.venv`, installs the server extras, and starts the local web UI on port `8310`.
+
 Install the server extras:
 
 ```bash

@@ -1,14 +1,24 @@
-<p align="center">
-  <img src="assets/saint-tibo.png" alt="Saint Tibo" width="600">
-</p>
-
 # god-tibo-imagen
+
+<p align="center">
+  <img src="test-web.png" alt="Gpt-imagen v2 web UI preview" width="900">
+</p>
 
 Node.js library and CLI for sending image-generation requests to Codex's private ChatGPT-authenticated backend path.
 
 This web test UI and FastAPI wrapper were built using [NomaDamas/god-tibo-imagen](https://github.com/NomaDamas/god-tibo-imagen) as the integration base.
 
 > WARNING: This is **not** a supported public API integration. It depends on private Codex request behavior that may change without notice.
+
+## Run the web UI
+
+From the repository root:
+
+```bash
+./run.sh
+```
+
+The script creates `.venv` when needed, installs the Python FastAPI server extras, and starts the development server at `http://127.0.0.1:8310`.
 
 ## What it does
 

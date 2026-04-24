@@ -17,6 +17,10 @@ dev = [
   "pytest",
   "pytest-asyncio",
 ]
+server = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gti"]

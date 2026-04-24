@@ -6,6 +6,8 @@
 
 Node.js library and CLI for sending image-generation requests to Codex's private ChatGPT-authenticated backend path.
 
+This web test UI and FastAPI wrapper were built using [NomaDamas/god-tibo-imagen](https://github.com/NomaDamas/god-tibo-imagen) as the integration base.
+
 > WARNING: This is **not** a supported public API integration. It depends on private Codex request behavior that may change without notice.
 
 ## What it does

@@ -57,3 +57,27 @@ result = client.generate_image(
 )
 print(result["mode"])  # "dry-run"
 ```
+
+## FastAPI test server
+
+Install the server extras:
+
+```bash
+pip install -e '.[server]'
+```
+
+Run the local web UI:
+
+```bash
+uvicorn gti.server:app --host 127.0.0.1 --port 8310 --reload
+```
+
+Open `http://127.0.0.1:8310` and submit a prompt. Generated PNG files are written to `./server-generated/` and served back through `/api/images/{filename}`.
+
+API example:
+
+```bash
+curl -sS http://127.0.0.1:8310/api/generate \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"flat blue square icon","model":"gpt-5.4","dry_run":true}'
+```

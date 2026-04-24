@@ -1,6 +1,7 @@
 .debug-*/
 smoke-output.png
 generated-*.png
+server-generated/
 
 # Node
 node_modules/
